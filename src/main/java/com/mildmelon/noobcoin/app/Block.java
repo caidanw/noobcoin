@@ -61,6 +61,7 @@ public class Block
         // Process transaction and check if valid, unless block is genesis block then ignore.
         if (transaction == null)
         {
+            System.out.println("Transaction is invalid. Discarded.");
             return false;
         }
 
@@ -74,7 +75,7 @@ public class Block
         }
 
         transactions.add(transaction);
-        System.out.println("Transaction Successfully added to Block");
+        System.out.println("Transaction Successfully added to block");
         return true;
     }
 

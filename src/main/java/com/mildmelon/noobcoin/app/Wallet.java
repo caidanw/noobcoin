@@ -12,14 +12,23 @@ import java.util.Map;
 
 public class Wallet
 {
-    
+    public static int count = 1; // Helps name nameless wallets (does not track total wallet count)
+
+    public String name;
     public PrivateKey privateKey;
     public PublicKey publicKey;
 
     public HashMap<String, TransactionOutput> utxos = new HashMap<>(); // Only UTXOs owned by this wallet
-    
+
     public Wallet()
     {
+        this("Wallet" + count);
+        count++;
+    }
+    
+    public Wallet(String name)
+    {
+        this.name = name;
         generateKeyPair();
     }
 
@@ -38,14 +47,13 @@ public class Wallet
             // Set the public and private keys from the keyPair
             privateKey = keyPair.getPrivate();
             publicKey = keyPair.getPublic();
-        }
-        catch (Exception e)
+        } catch (Exception e)
         {
             throw new RuntimeException(e);
         }
     }
 
-    // Returns balance and stores the UTXO's owned by this wallet in this.UTXOs
+    // Returns balance and stores the UTXO's owned by this wallet in this.utxos
     public float getBalance()
     {
         float total = 0;
@@ -61,12 +69,20 @@ public class Wallet
         return total;
     }
 
-    // Generates and returns a new transaction from this wallet.
-    public Transaction sendFunds(PublicKey recipient, float value)
+    // Print the balance in this wallet
+    public void printBalance()
     {
+        System.out.println(this.name + " balance: " + getBalance());
+    }
+
+    // Generates and returns a new transaction from this wallet.
+    public Transaction sendFunds(Wallet recipient, float value)
+    {
+        System.out.println("\n" + this.name + " is Attempting to send funds (" + value + ") to " + recipient.name);
+
         if (getBalance() < value) // Gather balance and check funds.
         {
-            System.out.println("#Not Enough funds to send transaction. Transaction Discarded.");
+            System.out.println("# Not Enough funds to send transaction. Transaction Discarded.");
             return null;
         }
 
@@ -74,7 +90,7 @@ public class Wallet
         ArrayList<TransactionInput> inputs = new ArrayList<>();
 
         float total = 0;
-        for (Map.Entry<String, TransactionOutput> item: utxos.entrySet())
+        for (Map.Entry<String, TransactionOutput> item: this.utxos.entrySet())
         {
             TransactionOutput utxo = item.getValue();
 
@@ -87,12 +103,12 @@ public class Wallet
             }
         }
 
-        Transaction newTransaction = new Transaction(publicKey, recipient, value, inputs);
-        newTransaction.generateSignature(privateKey);
+        Transaction newTransaction = new Transaction(this.publicKey, recipient.publicKey, value, inputs);
+        newTransaction.generateSignature(this.privateKey);
 
         for (TransactionInput input: inputs)
         {
-            utxos.remove(input.transactionOutputId);
+            this.utxos.remove(input.transactionOutputId);
         }
 
         return newTransaction;

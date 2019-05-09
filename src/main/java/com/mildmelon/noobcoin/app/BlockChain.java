@@ -1,5 +1,6 @@
 package com.mildmelon.noobcoin.app;
 
+import com.google.gson.GsonBuilder;
 import com.mildmelon.noobcoin.app.utils.StringUtil;
 
 import java.security.Security;
@@ -21,8 +22,8 @@ public class BlockChain
     public static ArrayList<Block> blockchain = new ArrayList<>();
     public static HashMap<String, TransactionOutput> UTXOs = new HashMap<>(); // List of all unspent transactions
 
-    public static Wallet walletA;
-    public static Wallet walletB;
+    public static Wallet wallet1;
+    public static Wallet wallet2;
 
     public static Transaction genesisTransaction;
 
@@ -32,12 +33,12 @@ public class BlockChain
         Security.addProvider(new BouncyCastleProvider());
 
         // Create the new wallets
-        walletA = new Wallet();
-        walletB = new Wallet();
-        Wallet coinbase = new Wallet();
+        wallet1 = new Wallet();
+        wallet2 = new Wallet();
+        Wallet coinbase = new Wallet("Coinbase");
 
-        // Create genesis transaction, which sends 100 NoobCoin to walletA
-        genesisTransaction = new Transaction(coinbase.publicKey, walletA.publicKey, 100f, null);
+        // Create genesis transaction, which sends 100 NoobCoin to wallet1
+        genesisTransaction = new Transaction(coinbase.publicKey, wallet1.publicKey, 100f, null);
         genesisTransaction.generateSignature(coinbase.privateKey);  // Manually sign the genesis transaction
         genesisTransaction.transactionId = "0";                     // Manually set the transaction id
         genesisTransaction.outputs.add(new TransactionOutput(
@@ -55,30 +56,33 @@ public class BlockChain
         addBlock(genesis);
 
         // Testing
+        wallet1.printBalance();
+        wallet2.printBalance();
+
         Block block1 = new Block(genesis.hash);
-        System.out.println("\nWalletA's balance is: " + walletA.getBalance());
-        System.out.println("\nWalletA is Attempting to send funds (40) to WalletB...");
-        block1.addTransaction(walletA.sendFunds(walletB.publicKey, 40f));
+        block1.addTransaction(wallet1.sendFunds(wallet2, 40f));
         addBlock(block1);
-        System.out.println("\nWalletA's balance is: " + walletA.getBalance());
-        System.out.println("WalletB's balance is: " + walletB.getBalance());
+
+        wallet1.printBalance();
+        wallet2.printBalance();
 
         Block block2 = new Block(block1.hash);
-        System.out.println("\nWalletA Attempting to send more funds (1000) than it has...");
-        block2.addTransaction(walletA.sendFunds(walletB.publicKey, 1000f));
+        block2.addTransaction(wallet1.sendFunds(wallet2, 1000f));
         addBlock(block2);
-        System.out.println("\nWalletA's balance is: " + walletA.getBalance());
-        System.out.println("WalletB's balance is: " + walletB.getBalance());
+
+        wallet1.printBalance();
+        wallet2.printBalance();
 
         Block block3 = new Block(block2.hash);
-        System.out.println("\nWalletB is Attempting to send funds (20) to WalletA...");
-        block3.addTransaction(walletB.sendFunds(walletA.publicKey, 20));
-        System.out.println("\nWalletA's balance is: " + walletA.getBalance());
-        System.out.println("WalletB's balance is: " + walletB.getBalance());
+        block3.addTransaction(wallet2.sendFunds(wallet1, 20));
+        addBlock(block3);
 
+        wallet1.printBalance();
+        wallet2.printBalance();
 
-        System.out.println("Blockchain is valid: " + isChainValid());
-
+        System.out.println("\nBlockchain is valid: " + isChainValid());
+        String blockchainJson = new GsonBuilder().setPrettyPrinting().create().toJson(blockchain);
+        System.out.println("Blockchain:\n" + blockchainJson);
     }
 
     public static Boolean isChainValid()

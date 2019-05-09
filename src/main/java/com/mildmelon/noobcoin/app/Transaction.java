@@ -63,7 +63,7 @@ public class Transaction
     {
         if (!verifySignature())
         {
-            System.out.println("#Transaction Signature failed to verify");
+            System.out.println("# Transaction Signature failed to verify");
             return false;
         }
 
@@ -76,7 +76,7 @@ public class Transaction
         // Check if transaction is valid
         if (getInputsValue() < BlockChain.minimumTransaction)
         {
-            System.out.println("#Transaction Inputs to small: " + getInputsValue());
+            System.out.println("# Transaction Inputs to small: " + getInputsValue());
             return false;
         }
 
