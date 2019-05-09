@@ -1,7 +1,5 @@
 package com.mildmelon.noobcoin.app;
 
-import static com.mildmelon.noobcoin.app.BlockChain.blockchain;
-
 import com.mildmelon.noobcoin.app.utils.StringUtil;
 
 import java.util.ArrayList;
@@ -34,7 +32,7 @@ public class Block
     // Increases nonce value until hash target is reached
     public void mineBlock(int difficulty)
     {
-        System.out.println("\nTrying to mine block: " + blockchain.indexOf(this));
+        System.out.println("\nTrying to mine new block with " + transactions.size() + " transactions");
 
         merkleRoot = StringUtil.getMerkleRoot(transactions);
         String target = StringUtil.getDifficultyString(difficulty);
