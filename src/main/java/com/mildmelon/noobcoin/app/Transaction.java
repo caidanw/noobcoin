@@ -11,10 +11,10 @@ public class Transaction
 {
 
     public String transactionId; // This is also the hash of the transaction
-    public PublicKey sender;     // The senders address/public key
-    public PublicKey recipient;  // The recipients address/public key
+    public transient PublicKey sender;     // The senders address/public key
+    public transient PublicKey recipient;  // The recipients address/public key
+    public transient byte[] signature;     // This is to prevent anybody else from spending funds in our wallet
     public float value;
-    public byte[] signature;     // THis is to prevent anybody else from spending funds in our wallet
 
     public ArrayList<TransactionInput> inputs = new ArrayList<>();
     public ArrayList<TransactionOutput> outputs = new ArrayList<>();
