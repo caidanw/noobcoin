@@ -44,7 +44,7 @@ public class Block
         {
             nonce++;
 
-            if (System.currentTimeMillis() - time >= 1000)
+            if (System.currentTimeMillis() - time >= 250)
             {
                 System.out.print("\rNonce: " + nonce);
                 time = System.currentTimeMillis();
